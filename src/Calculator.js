@@ -115,8 +115,21 @@ function Calculator() {
   };
 
   const sumMinOrPls = () => {
-    // 숫자가 양수라면 '(-'를 추가, 숫자가 음수라면 '(-'를 제거
     let lastBlank = cal.lastIndexOf(" ");
+    // 숫자가 양수라면 '(-'를 추가
+    if (cal[lastBlank + 1] !== "(") {
+      let str =
+        cal.substring(0, lastBlank + 1) + "(-" + cal.substring(lastBlank + 1);
+      setCal(str);
+      setParOpen(true);
+      return;
+    }
+    // 숫자가 음수라면 '(-'를 제거
+    if (cal[lastBlank + 1] === "(" && cal[lastBlank + 2] === "-") {
+      let str = cal.substring(0, lastBlank + 1) + cal.substring(lastBlank + 3);
+      setCal(str);
+      setParOpen(false);
+    }
     return;
   };
 
