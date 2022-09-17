@@ -78,7 +78,7 @@ function Calculator() {
     }
     // 안 닫힌 오프너가 있다면 클로저를 추가해야 함
     if (parOpen) {
-      setCal((v) => v + ")");
+      setCal((v) => v + " )");
       setParOpen(false);
     }
   };
@@ -126,16 +126,16 @@ function Calculator() {
   const sumMinOrPls = () => {
     let lastBlank = cal.lastIndexOf(" ");
     // 숫자가 양수라면 '(-'를 추가
-    if (cal[lastBlank + 1] !== "(") {
+    if (cal[lastBlank + 1] !== "-") {
       let str =
-        cal.substring(0, lastBlank + 1) + "(-" + cal.substring(lastBlank + 1);
+        cal.substring(0, lastBlank + 1) + "( -" + cal.substring(lastBlank + 1);
       setCal(str);
       setParOpen(true);
       return;
     }
     // 숫자가 음수라면 '(-'를 제거
-    if (cal[lastBlank + 1] === "(" && cal[lastBlank + 2] === "-") {
-      let str = cal.substring(0, lastBlank + 1) + cal.substring(lastBlank + 3);
+    if (cal[lastBlank + 1] === "-") {
+      let str = cal.substring(0, lastBlank - 1) + cal.substring(lastBlank + 2);
       setCal(str);
       setParOpen(false);
     }
@@ -145,7 +145,21 @@ function Calculator() {
   // 위의 함수들은 중위 표현식을 만들기 위한 함수들이고
   // calResult는 완성된 중위 표현식을 후위 표현식으로 변환하고, 그 결과를 계산하는 함수
   const calResult = () => {
-    setCal();
+    // 입력이 종료된 계산식에서 공백을 제거해준다
+    // let str = cal.replace(/(\s*)/g, "");
+
+    // 입력된 연산자들간의 우선순위를 판별할 함수를 작성
+    // const operPriority = (oper, stack) => {
+    //   // 우선순위가 낮은 순서대로 작성
+    //   if (oper === '+' || oper === '-') {
+    //     return 1;
+    //   } else if (oper === '÷' || oper === '×') {
+    //     return 2;
+    //   }
+    //   // (,)의 경우 open의 경우 가장 순위가 높다
+    //   else if (oper === '(')
+    // }
+    setCal(str);
   };
 
   // cal을 display상에서 천 단위 구분자를 보여주기 위한 정규식 적용
