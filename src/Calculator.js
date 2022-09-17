@@ -83,6 +83,15 @@ function Calculator() {
     }
   };
 
+  const sumPercent = () => {
+    let lastBlank = cal.lastIndexOf(" ");
+    // per를 적용할 범위를 설정, 범위 내 값을 숫자로 치환하여 /100을 계산하고 다시 붙여넣음
+    let str = cal.substring(lastBlank + 1);
+    let numPer = Number(str) / 100;
+    let perStr = cal.substring(0, lastBlank + 1) + String(numPer);
+    setCal(perStr);
+  };
+
   const sumZero = (e) => {
     // 0이 붙을 수 없는 조건인 '%'에서 뒤에 0을 넣는다면
     // 모든 숫자를 초기화하고, alert를 보낸다
@@ -156,7 +165,7 @@ function Calculator() {
         <Button value="()" onClick={sumPar}>
           ()
         </Button>
-        <CalButton value="%" onClick={sumOper}>
+        <CalButton value="%" onClick={sumPercent}>
           %
         </CalButton>
         <CalButton value="÷" onClick={sumOper}>
