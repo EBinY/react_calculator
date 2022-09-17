@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import {
   MainContainer,
+  FuncContainer,
   ButtonContainer,
   Button,
   CalButton,
@@ -28,6 +29,11 @@ function Calculator() {
 
   const [cal, setCal] = useState("");
 
+  // 괄호의 열리고 닫힘을 제어해줄 boolean state를 선언
+  const [parOpen, setParOpen] = useState(false);
+
+  // 음수양수 부호 버튼을 제어해야 하는데,
+
   // 계산식을 구성할 때에, 구분의 조건을 ' '로 잡아서 생각해야 함
   // 스택을 써야하나, 그럼 문제는 del기능을 구현할 때에 문제가 발생할 수 있음
   // 가장 편한 방식은 전체를 문자열로 놓고, 계산식에 특이점이 발생할 때에, ' '전까지만 보고 판별하면
@@ -36,6 +42,10 @@ function Calculator() {
   const sumNum = (e) => {
     // 숫자 12자리 제한을 구현해야 함
     // ' ' 또는 '.'으로 구분하여 .을 제외한 값이 12개를 넘어가면 입력되지 않도록 제한하자
+    let lastBlank = cal.lastIndexOf(" ");
+    if (cal.length - lastBlank > 12) {
+      return;
+    }
     setCal((v) => v + e.target.value);
   };
 
@@ -45,26 +55,31 @@ function Calculator() {
   };
 
   const sumDot = (e) => {
-    // dot이 맨 앞에는 붙지 못하도록 해야 함
-    if (cal.length === 0) {
-      return;
-    }
-    // dot이 한 숫자에서 1개 이상 붙지 못하도록 해야 함
-    if (!cal.includes(".")) {
-      setCal((v) => v + e.target.value);
-    }
+    // // dot이 맨 앞에는 붙지 못하도록 해야 함
+    // if (cal.length === 0) {
+    //   return;
+    // }
+    // // dot이 한 숫자에서 1개 이상 붙지 못하도록 해야 함
+    // if (!cal.includes(".")) {
+    //   setCal((v) => v + e.target.value);
+    // }
+    // 맨 앞 제한, 중간 제한, 숫자 당 1회 제한 등
+    // 부가적인 기능은 시간이 나면 추가하도록 하자
+    setCal((v) => v + e.target.value);
   };
 
   // 괄호 버튼은 1개로 되어 있음, 열림과 닫힘이 한버튼으로 구성되야 함
   const sumPar = () => {
     // 오프너가 포함되어 있는지 검색, 오프너가 없다면 오프너를 추가
     // 또한 오프너가 열리고 다시 닫힌 상태라면, 새로운 오프너가 열리도록 조건을 달아야 함
-    if (!cal.includes("(")) {
+    if (!parOpen) {
       setCal((v) => v + "(");
+      setParOpen(true);
     }
     // 안 닫힌 오프너가 있다면 클로저를 추가해야 함
-    if (cal.includes("(")) {
+    if (parOpen) {
       setCal((v) => v + ")");
+      setParOpen(false);
     }
   };
 
@@ -76,14 +91,16 @@ function Calculator() {
       setCal("");
       return;
     }
+    let lastBlank = cal.lastIndexOf(" ");
     // 0이 맨 앞이라면 1개만 추가되도록 해야 함
-    if (cal[0] === "0" && !cal.includes(".")) {
+    if ((cal[0] === "0" || cal[lastBlank + 1] === "0") && !cal.includes(".")) {
       return;
     }
     setCal((v) => v + e.target.value);
   };
 
   const delCal = () => {
+    // del버튼을 사용할 때에 부호일 경우 같이 삽입된 ' '도 함께 삭제
     if (cal[cal.length - 1] === " ") {
       let str = String(cal).slice(0, -3);
       setCal((v) => str);
@@ -98,8 +115,9 @@ function Calculator() {
   };
 
   const sumMinOrPls = () => {
-    // 숫자가 양수라면 '(-'를 추가
-    // 숫자가 음수라면 '
+    // 숫자가 양수라면 '(-'를 추가, 숫자가 음수라면 '(-'를 제거
+    let lastBlank = cal.lastIndexOf(" ");
+    return;
   };
 
   // 위의 함수들은 중위 표현식을 만들기 위한 함수들이고
@@ -108,15 +126,23 @@ function Calculator() {
     setCal();
   };
 
+  // cal을 display상에서 천 단위 구분자를 보여주기 위한 정규식 적용
   let str = cal.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  console.log(str);
 
   return (
     <MainContainer>
       <InputBar readOnly value={str} />
-      <ButtonContainer>
-        <Button onClick={clrCal}>AC</Button>
+      <FuncContainer>
+        <Button>다크모드</Button>
+        <Button></Button>
+        <Button></Button>
         <Button onClick={delCal}>DEL</Button>
+      </FuncContainer>
+      <ButtonContainer>
+        <Button onClick={clrCal}>C</Button>
+        <Button value="()" onClick={sumPar}>
+          ()
+        </Button>
         <CalButton value="%" onClick={sumOper}>
           %
         </CalButton>
@@ -159,14 +185,12 @@ function Calculator() {
         <CalButton value="+" onClick={sumOper}>
           +
         </CalButton>
+        <Button onClick={sumMinOrPls}>+/-</Button>
         <Button value={0} onClick={sumZero}>
           0
         </Button>
         <Button value="." onClick={sumDot}>
           .
-        </Button>
-        <Button value="()" onClick={sumPar}>
-          ()
         </Button>
         <CalButton onClick={calResult}>=</CalButton>
       </ButtonContainer>

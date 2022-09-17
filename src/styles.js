@@ -8,7 +8,18 @@ export const MainContainer = styled.div`
   height: 100vh;
 `;
 
+export const FuncContainer = styled.div`
+  display: grid;
+  width: 40%;
+  max-width: 450px;
+  height: 10%;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+`;
+
 export const ButtonContainer = styled.div`
+  margin-top: 10px;
   display: grid;
   width: 40%;
   max-width: 450px;
@@ -40,9 +51,9 @@ export const CalButton = styled(Button)`
   background-color: #4b89dc;
 `;
 
-export const ZeroButton = styled(Button)`
-  grid-column: 1/3;
-`;
+// export const ZeroButton = styled(Button)`
+//   grid-column: 1/3;
+// `;
 
 export const InputBar = styled.input`
   width: 40%;
