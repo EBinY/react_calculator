@@ -142,24 +142,100 @@ function Calculator() {
     return;
   };
 
-  // 위의 함수들은 중위 표현식을 만들기 위한 함수들이고
-  // calResult는 완성된 중위 표현식을 후위 표현식으로 변환하고, 그 결과를 계산하는 함수
-  const calResult = () => {
-    // 입력이 종료된 계산식에서 공백을 제거해준다
-    // let str = cal.replace(/(\s*)/g, "");
+  // 위의 함수들은 중위표현식을 만들기 위한 함수
+  // 아래의 함수들은 중위표현식을 후위표현식으로 전환, 결과를 계산하기 위한 함수
 
-    // 입력된 연산자들간의 우선순위를 판별할 함수를 작성
-    // const operPriority = (oper, stack) => {
-    //   // 우선순위가 낮은 순서대로 작성
-    //   if (oper === '+' || oper === '-') {
-    //     return 1;
-    //   } else if (oper === '÷' || oper === '×') {
-    //     return 2;
-    //   }
-    //   // (,)의 경우 open의 경우 가장 순위가 높다
-    //   else if (oper === '(')
-    // }
-    setCal(str);
+  // 입력된 연산자들간의 우선순위를 판별할 함수
+  const operPriority = (oper, stack) => {
+    if (oper === "+" || oper === "-") {
+      return 1;
+    } else if (oper === "÷" || oper === "×") {
+      return 2;
+    } else if (oper === "(") {
+      if (stack) return 0;
+      else return 5;
+    } else if (oper === ")") {
+      return 4;
+    }
+  };
+
+  // 중위표현식을 후위표현식으로 변환할 함수
+  const makePostfix = (e) => {
+    const operators = ["(", ")", "+", "-", "×", "÷"];
+    const stack = [];
+    const result = [];
+
+    e = e.split(" ");
+    e.forEach((oper) => {
+      if (operators.includes(oper)) {
+        if (oper === ")") {
+          // 토큰이 ')' 연산자인 경우, '('를 만날 때까지 result에 삽입
+          let pick = stack.pop();
+          while (pick !== "(") {
+            result.push(pick);
+            pick = stack.pop();
+          }
+        } else {
+          if (stack.length === 0) {
+            stack.push(oper);
+          } else {
+            // 최상위 노드와 토큰의 연산자 우선순위 비교
+            // 이 과정이 없으면 '1 - 3 * 2'의 후위 표현식이 '1 3 - 2 *'가 됨
+            let pick = stack.pop();
+            if (operPriority(pick, true) > operPriority(oper, false)) {
+              result.push(pick);
+            } else {
+              stack.push(pick);
+            }
+            stack.push(oper);
+          }
+        }
+      } else {
+        // 토큰이 피연산자인 경우 result에 삽입
+        result.push(oper);
+      }
+    });
+
+    // 스택의 남은 노드(연산자)를 모두 후위에 붙임
+    while (stack.length !== 0) {
+      result.push(stack.pop());
+    }
+
+    return result.join(" ");
+  };
+
+  // 후위표현식을 계산할 함수
+  const calPostfix = (e) => {
+    const operators = ["+", "-", "×", "÷"];
+    const stack = [];
+
+    e.split(" ").forEach((oper) => {
+      if (operators.includes(oper)) {
+        let num1 = parseFloat(stack.pop());
+        let num2 = parseFloat(stack.pop());
+        let temp;
+
+        if (oper === "+") temp = num2 + num1;
+        else if (oper === "-") temp = num2 - num1;
+        else if (oper === "×") temp = num2 * num1;
+        else if (oper === "÷") temp = num2 / num1;
+
+        stack.push(temp);
+      } else {
+        stack.push(oper);
+      }
+    });
+
+    return stack[0];
+  };
+
+  // 작성된 함수들을 모듈로 사용할 실행 함수
+  const calResult = () => {
+    let str = makePostfix(cal);
+    console.log(str);
+    let result = calPostfix(str);
+    console.log(result);
+    setCal(result);
   };
 
   // cal을 display상에서 천 단위 구분자를 보여주기 위한 정규식 적용

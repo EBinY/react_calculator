@@ -5,13 +5,13 @@ export const MainContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 800px;
+  width: 360px;
 `;
 
 export const FuncContainer = styled.div`
   display: grid;
-  width: 40%;
-  max-width: 450px;
+  width: 320px;
   height: 10%;
   grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 10px;
@@ -21,9 +21,8 @@ export const FuncContainer = styled.div`
 export const ButtonContainer = styled.div`
   margin-top: 10px;
   display: grid;
-  width: 40%;
-  max-width: 450px;
-  height: 50%;
+  width: 330px;
+  height: 358px;
   grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 10px;
   grid-row-gap: 10px;
@@ -50,10 +49,6 @@ export const CalButton = styled(Button)`
   color: white;
   background-color: #4b89dc;
 `;
-
-// export const ZeroButton = styled(Button)`
-//   grid-column: 1/3;
-// `;
 
 export const InputBar = styled.input`
   width: 40%;
