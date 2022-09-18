@@ -1,39 +1,28 @@
 import React from "react";
 import { useState } from "react";
+import { FiDelete } from "react-icons/fi";
+import { BsMoonFill } from "react-icons/bs";
+import { FcIdea } from "react-icons/fc";
 import {
   MainContainer,
   FuncContainer,
   ButtonContainer,
   Button,
+  ModButton,
+  DelButton,
   CalButton,
-  InputBar,
+  ClrButton,
+  EquButton,
+  DisplayBox,
 } from "./styles";
 
-function Calculator() {
-  // 필수 조건
-  // 1. 소수점까지 연산 가능한 계산기 기능 구현
-  // 2. del 기능: 뒤에서부터 1자리씩 삭제, 숫자 기호 구분 없이
-  // 3. 숫자 천단위 구분자 표시
-  // 4. ac 기능: 모든 연산 초기화
-  // 5. 화면에 선택한 숫자/기호 표시, 등호 누르면 결과값이 계산되어 표시
-  // 6. 부호 전환: 양수를 누르면 음수로 전환('(-'를 붙여서 음수 계산을 괄호에 넣어야 함)
-  // 7. 괄호 기능 구현
-  // 8. 숫자는 최대 12자리까지 입력 가능
-  // 기타1. '%' 기능에 대한 조건 없음, 일반 계산기처럼 기능하도록 구현
-  // 기타2. 조건 없는 기능들('.', '0나누기')등은 최대한 일반 계산기처럼 구현하도록 할 것
-
-  // state로 계산식을 관리, 등호를 가동하였을 때에 state의 값으로 함수식을 계산하고 결과값으로 다시 대체
-  // display값은 state 그대로 사용하면, 등호 등의 문제가 발생하여 최하단에 str로 대체하고 정규식 적용
-  // 숫자 12자리 제한 적용 고민, 등호 이전까지의 연속된 숫자가 12자리여야 함
-  // 계산 결과 또한 12자리여야 함, 넘어갈 경우 과학적 표기법으로 대체해야 함(필수 x, 추가 사항)
-
+function Calculator({ isDarkMode, toggleDarkMode }) {
   const [cal, setCal] = useState("");
 
   // 괄호의 열리고 닫힘을 제어해줄 boolean state를 선언
   const [parOpen, setParOpen] = useState(false);
 
   // 음수양수 부호 버튼을 제어해야 하는데,
-
   // 계산식을 구성할 때에, 구분의 조건을 ' '로 잡아서 생각해야 함
   // 스택을 써야하나, 그럼 문제는 del기능을 구현할 때에 문제가 발생할 수 있음
   // 가장 편한 방식은 전체를 문자열로 놓고, 계산식에 특이점이 발생할 때에, ' '전까지만 보고 판별하면
@@ -112,6 +101,12 @@ function Calculator() {
     // del버튼을 사용할 때에 부호일 경우 같이 삽입된 ' '도 함께 삭제
     if (cal[cal.length - 1] === " ") {
       let str = String(cal).slice(0, -3);
+      setCal((v) => str);
+      return;
+    }
+    if (cal[cal.length - 1] === "(") {
+      setParOpen(false);
+      let str = String(cal).slice(0, -1);
       setCal((v) => str);
       return;
     }
@@ -232,9 +227,7 @@ function Calculator() {
   // 작성된 함수들을 모듈로 사용할 실행 함수
   const calResult = () => {
     let str = makePostfix(cal);
-    console.log(str);
     let result = calPostfix(str);
-    console.log(result);
     setCal(result);
   };
 
@@ -243,18 +236,32 @@ function Calculator() {
 
   return (
     <MainContainer>
-      <InputBar readOnly value={str} />
+      <DisplayBox readOnly maxLength={12} value={str} />
       <FuncContainer>
-        <Button>다크모드</Button>
-        <Button></Button>
-        <Button></Button>
-        <Button onClick={delCal}>DEL</Button>
+        <ModButton onClick={toggleDarkMode}>
+          {isDarkMode ? (
+            <>
+              <FcIdea />
+              노말 모드
+            </>
+          ) : (
+            <>
+              <BsMoonFill />
+              다크 모드
+            </>
+          )}
+        </ModButton>
+        <ModButton></ModButton>
+        <ModButton></ModButton>
+        <DelButton onClick={delCal}>
+          <FiDelete />
+        </DelButton>
       </FuncContainer>
       <ButtonContainer>
-        <Button onClick={clrCal}>C</Button>
-        <Button value="()" onClick={sumPar}>
+        <ClrButton onClick={clrCal}>C</ClrButton>
+        <CalButton value="()" onClick={sumPar}>
           ()
-        </Button>
+        </CalButton>
         <CalButton value="%" onClick={sumPercent}>
           %
         </CalButton>
@@ -304,7 +311,7 @@ function Calculator() {
         <Button value="." onClick={sumDot}>
           .
         </Button>
-        <CalButton onClick={calResult}>=</CalButton>
+        <EquButton onClick={calResult}>=</EquButton>
       </ButtonContainer>
     </MainContainer>
   );
