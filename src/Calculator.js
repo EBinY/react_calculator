@@ -190,13 +190,11 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
         <ModButton onClick={toggleDarkMode}>
           {isDarkMode ? (
             <>
-              <FcIdea />
-              노말 모드
+              <FcIdea /> 노말 모드
             </>
           ) : (
             <>
-              <BsMoonFill />
-              다크 모드
+              <BsMoonFill /> 다크 모드
             </>
           )}
         </ModButton>
