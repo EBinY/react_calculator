@@ -14,23 +14,13 @@ import {
   ClrButton,
   EquButton,
   DisplayBox,
-} from "./styles";
+} from "./Styles";
 
 function Calculator({ isDarkMode, toggleDarkMode }) {
   const [cal, setCal] = useState("");
-
-  // 괄호의 열리고 닫힘을 제어해줄 boolean state를 선언
   const [parOpen, setParOpen] = useState(false);
 
-  // 음수양수 부호 버튼을 제어해야 하는데,
-  // 계산식을 구성할 때에, 구분의 조건을 ' '로 잡아서 생각해야 함
-  // 스택을 써야하나, 그럼 문제는 del기능을 구현할 때에 문제가 발생할 수 있음
-  // 가장 편한 방식은 전체를 문자열로 놓고, 계산식에 특이점이 발생할 때에, ' '전까지만 보고 판별하면
-  // 그럼 결국 스택으로 쌓아야 하는데, del 기능을
-
   const sumNum = (e) => {
-    // 숫자 12자리 제한을 구현해야 함
-    // ' ' 또는 '.'으로 구분하여 .을 제외한 값이 12개를 넘어가면 입력되지 않도록 제한하자
     let lastBlank = cal.lastIndexOf(" ");
     if (cal.length - lastBlank > 12) {
       return;
@@ -39,33 +29,18 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
   };
 
   const sumOper = (e) => {
-    // 부호를 넣을 때에 ' '를 앞, 뒤로 넣어서 숫자와 부호를 구분짓도록 함
     setCal((v) => v + " " + e.target.value + " ");
   };
 
   const sumDot = (e) => {
-    // // dot이 맨 앞에는 붙지 못하도록 해야 함
-    // if (cal.length === 0) {
-    //   return;
-    // }
-    // // dot이 한 숫자에서 1개 이상 붙지 못하도록 해야 함
-    // if (!cal.includes(".")) {
-    //   setCal((v) => v + e.target.value);
-    // }
-    // 맨 앞 제한, 중간 제한, 숫자 당 1회 제한 등
-    // 부가적인 기능은 시간이 나면 추가하도록 하자
     setCal((v) => v + e.target.value);
   };
 
-  // 괄호 버튼은 1개로 되어 있음, 열림과 닫힘이 한버튼으로 구성되야 함
   const sumPar = () => {
-    // 오프너가 포함되어 있는지 검색, 오프너가 없다면 오프너를 추가
-    // 또한 오프너가 열리고 다시 닫힌 상태라면, 새로운 오프너가 열리도록 조건을 달아야 함
     if (!parOpen) {
-      setCal((v) => v + "(");
+      setCal((v) => v + "( ");
       setParOpen(true);
     }
-    // 안 닫힌 오프너가 있다면 클로저를 추가해야 함
     if (parOpen) {
       setCal((v) => v + " )");
       setParOpen(false);
@@ -74,7 +49,6 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
 
   const sumPercent = () => {
     let lastBlank = cal.lastIndexOf(" ");
-    // per를 적용할 범위를 설정, 범위 내 값을 숫자로 치환하여 /100을 계산하고 다시 붙여넣음
     let str = cal.substring(lastBlank + 1);
     let numPer = Number(str) / 100;
     let perStr = cal.substring(0, lastBlank + 1) + String(numPer);
@@ -82,15 +56,12 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
   };
 
   const sumZero = (e) => {
-    // 0이 붙을 수 없는 조건인 '%'에서 뒤에 0을 넣는다면
-    // 모든 숫자를 초기화하고, alert를 보낸다
     if (cal[cal.length - 2] === "÷" && e.target.value === "0") {
       alert("0으로는 나눌 수 없습니다");
       setCal("");
       return;
     }
     let lastBlank = cal.lastIndexOf(" ");
-    // 0이 맨 앞이라면 1개만 추가되도록 해야 함
     if ((cal[0] === "0" || cal[lastBlank + 1] === "0") && !cal.includes(".")) {
       return;
     }
@@ -98,7 +69,6 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
   };
 
   const delCal = () => {
-    // del버튼을 사용할 때에 부호일 경우 같이 삽입된 ' '도 함께 삭제
     if (cal[cal.length - 1] === " ") {
       let str = String(cal).slice(0, -3);
       setCal((v) => str);
@@ -116,11 +86,11 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
 
   const clrCal = () => {
     setCal("");
+    setParOpen(false);
   };
 
   const sumMinOrPls = () => {
     let lastBlank = cal.lastIndexOf(" ");
-    // 숫자가 양수라면 '(-'를 추가
     if (cal[lastBlank + 1] !== "-") {
       let str =
         cal.substring(0, lastBlank + 1) + "( -" + cal.substring(lastBlank + 1);
@@ -128,7 +98,6 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
       setParOpen(true);
       return;
     }
-    // 숫자가 음수라면 '(-'를 제거
     if (cal[lastBlank + 1] === "-") {
       let str = cal.substring(0, lastBlank - 1) + cal.substring(lastBlank + 2);
       setCal(str);
@@ -137,10 +106,6 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
     return;
   };
 
-  // 위의 함수들은 중위표현식을 만들기 위한 함수
-  // 아래의 함수들은 중위표현식을 후위표현식으로 전환, 결과를 계산하기 위한 함수
-
-  // 입력된 연산자들간의 우선순위를 판별할 함수
   const operPriority = (oper, stack) => {
     if (oper === "+" || oper === "-") {
       return 1;
@@ -154,17 +119,14 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
     }
   };
 
-  // 중위표현식을 후위표현식으로 변환할 함수
   const makePostfix = (e) => {
     const operators = ["(", ")", "+", "-", "×", "÷"];
     const stack = [];
     const result = [];
-
     e = e.split(" ");
     e.forEach((oper) => {
       if (operators.includes(oper)) {
         if (oper === ")") {
-          // 토큰이 ')' 연산자인 경우, '('를 만날 때까지 result에 삽입
           let pick = stack.pop();
           while (pick !== "(") {
             result.push(pick);
@@ -174,8 +136,6 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
           if (stack.length === 0) {
             stack.push(oper);
           } else {
-            // 최상위 노드와 토큰의 연산자 우선순위 비교
-            // 이 과정이 없으면 '1 - 3 * 2'의 후위 표현식이 '1 3 - 2 *'가 됨
             let pick = stack.pop();
             if (operPriority(pick, true) > operPriority(oper, false)) {
               result.push(pick);
@@ -186,52 +146,41 @@ function Calculator({ isDarkMode, toggleDarkMode }) {
           }
         }
       } else {
-        // 토큰이 피연산자인 경우 result에 삽입
         result.push(oper);
       }
     });
-
-    // 스택의 남은 노드(연산자)를 모두 후위에 붙임
     while (stack.length !== 0) {
       result.push(stack.pop());
     }
-
     return result.join(" ");
   };
 
-  // 후위표현식을 계산할 함수
   const calPostfix = (e) => {
     const operators = ["+", "-", "×", "÷"];
     const stack = [];
-
     e.split(" ").forEach((oper) => {
       if (operators.includes(oper)) {
         let num1 = parseFloat(stack.pop());
         let num2 = parseFloat(stack.pop());
         let temp;
-
         if (oper === "+") temp = num2 + num1;
         else if (oper === "-") temp = num2 - num1;
         else if (oper === "×") temp = num2 * num1;
         else if (oper === "÷") temp = num2 / num1;
-
         stack.push(temp);
       } else {
         stack.push(oper);
       }
     });
-
     return stack[0];
   };
 
-  // 작성된 함수들을 모듈로 사용할 실행 함수
   const calResult = () => {
     let str = makePostfix(cal);
     let result = calPostfix(str);
     setCal(result);
   };
 
-  // cal을 display상에서 천 단위 구분자를 보여주기 위한 정규식 적용
   let str = cal.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
   return (
