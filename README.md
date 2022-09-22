@@ -1,1 +1,1 @@
-# MDPT Subject - Calculator
+# React - Calculator
